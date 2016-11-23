@@ -5,6 +5,7 @@ require_once 'connect.php';
 $ip=$_SERVER['REMOTE_ADDR'];
 $date = date("y-m-d");
 $action=$_GET["action"];
+$fail_count=0;
 
 switch ($action) {
    case get_zitat:
@@ -13,23 +14,34 @@ switch ($action) {
        if (! $db_erg) {
            die ( 'failed' );
            }
-       while ($zeile = mysqli_fetch_array ( $db_erg, MYSQL_ASSOC  )) {
+       while ($zeile = mysqli_fetch_array ( $db_erg, MYSQL_ASSOC)) {
            $max=$zeile["value"];
        }
        mysqli_free_result ( $db_erg );
-       $right=rand(1, 4);
-       $zitat_id=rand(1,$max);
-       $sql ="SELECT * FROM `zitate` WHERE id=$zitat_id;";
-       $db_erg = mysqli_query ( $link, $sql );
-       if (! $db_erg) {
-           die ( 'failed' );
-       }
-       while ($zeile = mysqli_fetch_array ( $db_erg, MYSQL_ASSOC  )) {
-               foreach ($zeile as $key => $value) {
-                   $$key=$value;
+       $good=false;
+       while ($good==false){
+           $right=rand(1, 4);
+           $zitat_id=rand(1,$max);
+           $sql ="SELECT * FROM `zitate` WHERE id=$zitat_id;";
+           $db_erg = mysqli_query ( $link, $sql );
+           if (! $db_erg) {
+               if ($fail_count==3){
+                   die ( 'failed' );
                }
+               else {
+                   $fail_count++;
+               }
+           }
+           else{
+               while ($zeile = mysqli_fetch_array ( $db_erg, MYSQL_ASSOC)) {
+                   foreach ($zeile as $key => $value) {
+                       $$key=$value;
+                   }
+               }
+               mysqli_free_result ( $db_erg );
+               $good=true;
+           }
        }
-       mysqli_free_result ( $db_erg );
        $i=1;
        $ids = array (0,$zitat_id);
        while ($i < 5) {
@@ -47,18 +59,24 @@ switch ($action) {
                        $sql ="SELECT (autor) FROM `zitate` WHERE id=$temp_id;";
                        $db_erg = mysqli_query ( $link, $sql );
                        if (! $db_erg) {
-                           die ( 'failed' );
+                           if ($fail_count==3){
+                               die ( 'failed' );
+                           }
+                           else {
+                               $fail_count++;
+                           }
                        }
-                       while ($zeile = mysqli_fetch_array ( $db_erg, MYSQL_ASSOC  )) {
-                           $temp=$zeile["autor"];
-                       }
-                       mysqli_free_result ( $db_erg );
-                       if ($temp!=$autor){
-                           $good = true;
+                       else{
+                           while ($zeile = mysqli_fetch_array ( $db_erg, MYSQL_ASSOC)) {
+                               $temp=$zeile["autor"];
+                           }
+                           mysqli_free_result ( $db_erg );
+                           if ($temp!=$autor){
+                               $good = true;
+                           }
                        }
                    }
                }
-
            }
            switch ($i) {
                case 1:
