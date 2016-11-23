@@ -8,7 +8,7 @@
 ?>
 <html>
 <head>
-    <title>score</title>
+    <title>Score</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.cyan-pink.min.css" />
     <script defer src="https://code.getmdl.io/1.2.1/material.min.js"></script>
