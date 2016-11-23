@@ -6,7 +6,6 @@ $ip=$_SERVER['REMOTE_ADDR'];
 $date = date("y-m-d");
 $action=$_GET["action"];
 
-
 switch ($action) {
    case get_zitat:
        $sql ="SELECT MAX(id) AS value FROM `zitate`;";
@@ -45,18 +44,21 @@ switch ($action) {
                        $good = false;
                    } else {
                        $ids[]=$temp_id;
-                       $good = true;
+                       $sql ="SELECT (autor) FROM `zitate` WHERE id=$temp_id;";
+                       $db_erg = mysqli_query ( $link, $sql );
+                       if (! $db_erg) {
+                           die ( 'failed' );
+                       }
+                       while ($zeile = mysqli_fetch_array ( $db_erg, MYSQL_ASSOC  )) {
+                           $temp=$zeile["autor"];
+                       }
+                       mysqli_free_result ( $db_erg );
+                       if ($temp!=$autor){
+                           $good = true;
+                       }
                    }
                }
-               $sql ="SELECT (autor) FROM `zitate` WHERE id=$temp_id;";
-               $db_erg = mysqli_query ( $link, $sql );
-               if (! $db_erg) {
-                   die ( 'failed' );
-               }
-               while ($zeile = mysqli_fetch_array ( $db_erg, MYSQL_ASSOC  )) {
-                   $temp=$zeile["autor"];
-               }
-               mysqli_free_result ( $db_erg );
+
            }
            switch ($i) {
                case 1:
@@ -96,7 +98,7 @@ switch ($action) {
         $name=$_POST["name"];
         $punkte=$_POST["punkte"];
         if ($punkte > 0) {
-            $sql = "INSERT INTO sc (`id`, `name`, `punkte`, `ip`, `date`) VALUES (NULL, '$name', '$punkte', '$ip', '$date');";
+            $sql = "INSERT INTO sc (`id`, `name`, `punkte`, `ip`, `date`) VALUES (NULL, '$name','$punkte','$ip','$date');";
             $db_erg = mysqli_query($link, $sql);
             if (!$db_erg) {
                 die ('failed');
@@ -144,4 +146,3 @@ switch ($action) {
         break;
 }
 ?>
-
